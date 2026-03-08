@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test - Derecho y Empresa</title>
+  <link rel="stylesheet" href="estilos.css">
+  <style>
+    .pregunta-box {
+      background: white;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      margin-bottom: 20px;
+    }
+
+    .pregunta-numero {
+      font-size: 0.95rem;
+      color: #666;
+      margin-bottom: 10px;
+    }
+
+    .pregunta-texto {
+      font-size: 1.2rem;
+      font-weight: bold;
+      margin-bottom: 20px;
+      color: #1e3a5f;
+    }
+
+    .opciones {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .opcion {
+      width: 100%;
+      border: none;
+      border-radius: 10px;
+      padding: 14px;
+      text-align: left;
+      font-size: 1rem;
+      cursor: pointer;
+      background-color: #eef3fb;
+      transition: 0.3s;
+    }
+
+    .opcion:hover {
+      background-color: #dbe7f8;
+    }
+
+    .opcion.correcta {
+      background-color: #cfeecf;
+      border: 2px solid #4caf50;
+    }
+
+    .opcion.incorrecta {
+      background-color: #f8d7da;
+      border: 2px solid #dc3545;
+    }
+
+    .resultado {
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: 10px;
+      display: none;
+    }
+
+    .resultado.ok {
+      background-color: #e8f5e9;
+      border-left: 5px solid #4caf50;
+    }
+
+    .resultado.error {
+      background-color: #fdecea;
+      border-left: 5px solid #dc3545;
+    }
+
+    .explicacion {
+      margin-top: 8px;
+    }
+
+    .barra-superior {
+      display: flex;
+      justify-content: space-between;
+      gap: 15px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+
+    .mini-tarjeta {
+      background: white;
+      padding: 15px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      flex: 1;
+      min-width: 200px;
+    }
+
+    .acciones-test {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 20px;
+    }
+
+    .boton-secundario {
+      display: inline-block;
+      text-align: center;
+      text-decoration: none;
+      background-color: #6c757d;
+      color: white;
+      padding: 14px 18px;
+      border-radius: 10px;
+      font-weight: bold;
+      border: none;
+      cursor: pointer;
+    }
+
+    .boton-secundario:hover {
+      background-color: #565e64;
+    }
+
+    .oculto {
+      display: none;
+    }
+
+    .final-box {
+      background: white;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      text-align: center;
+    }
+
+    .barra-progreso {
+      width: 100%;
+      height: 14px;
+      background-color: #dfe7f3;
+      border-radius: 10px;
+      overflow: hidden;
+      margin-top: 10px;
+    }
+
+    .barra-progreso-interna {
+      height: 100%;
+      width: 0%;
+      background-color: #2f6fed;
+      transition: width 0.3s ease;
+    }
+
+    @media (max-width: 600px) {
+      .pregunta-texto {
+        font-size: 1.05rem;
+      }
+
+      .opcion {
+        font-size: 0.95rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Test de Derecho y Empresa</h1>
+    <p>Practica y corrige tus errores al momento</p>
+  </header>
+
+  <main class="contenedor">
+    <section class="barra-superior">
+      <div class="mini-tarjeta">
+        <h2>Progreso</h2>
+        <p id="progreso">Pregunta 1 de 40</p>
+        <div class="barra-progreso">
+          <div class="barra-progreso-interna" id="barraProgreso"></div>
+        </div>
+      </div>
+      <div class="mini-tarjeta">
+        <h2>Aciertos</h2>
+        <p id="marcador">0</p>
+      </div>
+    </section>
+
+    <section class="pregunta-box" id="quizBox">
+      <p class="pregunta-numero" id="numeroPregunta">Pregunta 1</p>
+      <div class="pregunta-texto" id="textoPregunta"></div>
+
+      <div class="opciones" id="opciones"></div>
+
+      <div class="resultado" id="resultado"></div>
+
+      <div class="acciones-test">
+        <button class="boton oculto" id="btnSiguiente">Siguiente pregunta</button>
+        <a href="index.html" class="boton-secundario">Volver al inicio</a>
+      </div>
+    </section>
+
+    <section class="final-box oculto" id="finalBox">
+      <h2>Has terminado el test</h2>
+      <p id="notaFinal"></p>
+      <div class="acciones-test" style="justify-content:center;">
+        <button class="boton" id="btnReiniciar">Reiniciar test</button>
+        <a href="resumen.html" class="boton">Ir al resumen</a>
+        <a href="esquema.html" class="boton">Ir al esquema</a>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const bancoPreguntas = [
+      {
+        pregunta: "¿Cuál de estas formas pertenece a las empresas con personalidad física?",
+        opciones: ["Sociedad anónima", "Sociedad limitada", "Empresario individual o autónomo", "Sociedad laboral"],
+        correcta: 2,
+        explicacion: "Las empresas con personalidad física incluyen al empresario individual o autónomo, la sociedad civil y la comunidad de bienes."
+      },
+      {
+        pregunta: "El empresario individual realiza la actividad económica:",
+        opciones: ["En nombre de una sociedad mercantil", "En nombre propio", "En nombre del Ayuntamiento", "En nombre de los trabajadores"],
+        correcta: 1,
+        explicacion: "El autónomo o empresario individual actúa en nombre propio."
+      },
+      {
+        pregunta: "En el empresario individual o autónomo, la responsabilidad es:",
+        opciones: ["Limitada al capital aportado", "Ilimitada", "Compartida con el Estado", "Solo sobre beneficios"],
+        correcta: 1,
+        explicacion: "El autónomo responde con todo su patrimonio, por eso su responsabilidad es ilimitada."
+      },
+      {
+        pregunta: "¿Qué tributación tiene normalmente el empresario individual según el tema?",
+        opciones: ["IVA exclusivamente", "Impuesto de Sociedades", "IRPF", "IBI"],
+        correcta: 2,
+        explicacion: "El empresario individual tributa por IRPF."
+      },
+      {
+        pregunta: "La sociedad civil es:",
+        opciones: ["Una sociedad con acciones", "Un contrato entre dos o más personas", "Una administración pública", "Una cooperativa de segundo grado"],
+        correcta: 1,
+        explicacion: "La sociedad civil nace de un contrato entre dos o más personas para poner en común dinero, bienes o trabajo."
+      },
+      {
+        pregunta: "¿Cuál es el objetivo de la sociedad civil?",
+        opciones: ["Recaudar impuestos", "Repartir beneficios", "Emitir reglamentos", "Crear leyes orgánicas"],
+        correcta: 1,
+        explicacion: "La sociedad civil busca repartir los beneficios obtenidos por la actividad común."
+      },
+      {
+        pregunta: "¿Cuántos socios mínimos se necesitan en una sociedad civil?",
+        opciones: ["1", "2", "3", "4"],
+        correcta: 1,
+        explicacion: "La sociedad civil requiere al menos dos socios."
+      },
+      {
+        pregunta: "La responsabilidad en la sociedad civil es:",
+        opciones: ["Limitada", "Ilimitada", "Solo administrativa", "Temporal"],
+        correcta: 1,
+        explicacion: "En la sociedad civil la responsabilidad es ilimitada."
+      },
+      {
+        pregunta: "La comunidad de bienes se caracteriza porque:",
+        opciones: ["Su capital está dividido en acciones", "Dos o más personas comparten una propiedad", "Tiene responsabilidad limitada", "Exige 60.000 € de capital"],
+        correcta: 1,
+        explicacion: "La comunidad de bienes parte de una propiedad común compartida por dos o más personas."
+      },
+      {
+        pregunta: "La comunidad de bienes tributa por:",
+        opciones: ["IRPF", "Impuesto de Sociedades", "IVA especial", "Impuesto sobre Sucesiones"],
+        correcta: 0,
+        explicacion: "Según el tema, la comunidad de bienes tributa por IRPF."
+      },
+      {
+        pregunta: "Las sociedades mercantiles tienen:",
+        opciones: ["Personalidad física", "Personalidad jurídica propia", "Solo personalidad moral", "Carácter no empresarial"],
+        correcta: 1,
+        explicacion: "Las sociedades mercantiles se caracterizan por tener personalidad jurídica propia."
+      },
+      {
+        pregunta: "¿Cuál de estas sociedades mercantiles tiene responsabilidad ilimitada para todos sus socios?",
+        opciones: ["Sociedad colectiva", "Sociedad limitada", "Sociedad anónima", "Sociedad laboral"],
+        correcta: 0,
+        explicacion: "En la sociedad colectiva los socios responden de forma ilimitada."
+      },
+      {
+        pregunta: "En la sociedad colectiva, los socios aportan:",
+        opciones: ["Solo acciones", "Capital y trabajo", "Solo inmuebles", "Solo bonos"],
+        correcta: 1,
+        explicacion: "En la sociedad colectiva los socios aportan capital y trabajo."
+      },
+      {
+        pregunta: "La sociedad colectiva necesita como mínimo:",
+        opciones: ["1 socio", "2 socios", "3 socios", "5 socios"],
+        correcta: 1,
+        explicacion: "La sociedad colectiva requiere un mínimo de dos socios."
+      },
+      {
+        pregunta: "La sociedad colectiva debe inscribirse en:",
+        opciones: ["El BOE", "El Registro Civil", "El Registro Mercantil", "La Seguridad Social solamente"],
+        correcta: 2,
+        explicacion: "La sociedad colectiva debe inscribirse en el Registro Mercantil."
+      },
+      {
+        pregunta: "En la sociedad comanditaria simple existen:",
+        opciones: ["Solo socios trabajadores", "Socios colectivos y comanditarios", "Solo socios capitalistas", "Accionistas y obligacionistas"],
+        correcta: 1,
+        explicacion: "La sociedad comanditaria simple distingue entre socios colectivos y socios comanditarios."
+      },
+      {
+        pregunta: "En la sociedad comanditaria simple, los socios colectivos:",
+        opciones: ["Solo aportan capital", "No pueden gestionar", "Gestionan la empresa y tienen responsabilidad ilimitada", "Siempre tienen responsabilidad limitada"],
+        correcta: 2,
+        explicacion: "Los socios colectivos gestionan la empresa y responden ilimitadamente."
+      },
+      {
+        pregunta: "En la sociedad comanditaria simple, los socios comanditarios:",
+        opciones: ["Gestionan la empresa y tienen responsabilidad ilimitada", "Solo aportan capital y su responsabilidad es limitada", "Son siempre trabajadores indefinidos", "Pueden emitir acciones libremente"],
+        correcta: 1,
+        explicacion: "Los comanditarios aportan capital, no gestionan la empresa y su responsabilidad queda limitada."
+      },
+      {
+        pregunta: "La sociedad comanditaria simple tributa por:",
+        opciones: ["IRPF", "Impuesto de Sociedades", "IBI", "Solo IVA"],
+        correcta: 1,
+        explicacion: "La sociedad comanditaria simple tributa por Impuesto de Sociedades."
+      },
+      {
+        pregunta: "El capital mínimo de una sociedad limitada (SL) es:",
+        opciones: ["No se exige capital mínimo", "3.000 €", "30.000 €", "60.000 €"],
+        correcta: 1,
+        explicacion: "La SL exige un capital mínimo de 3.000 euros."
+      },
+      {
+        pregunta: "En la sociedad limitada, la responsabilidad de los socios es:",
+        opciones: ["Ilimitada", "Limitada al capital aportado", "Responsabilidad penal directa", "Solo laboral"],
+        correcta: 1,
+        explicacion: "En la SL la responsabilidad queda limitada al capital aportado."
+      },
+      {
+        pregunta: "En la sociedad limitada, el capital se divide en:",
+        opciones: ["Acciones", "Bonos", "Participaciones", "Cuotas sindicales"],
+        correcta: 2,
+        explicacion: "La SL tiene el capital dividido en participaciones."
+      },
+      {
+        pregunta: "Las participaciones de la SL son:",
+        opciones: ["Iguales, acumulables e indivisibles", "Acciones cotizables", "Títulos al portador", "Siempre libremente transmisibles"],
+        correcta: 0,
+        explicacion: "Según el tema, las participaciones son iguales, acumulables e indivisibles."
+      },
+      {
+        pregunta: "La transmisión en la sociedad limitada es:",
+        opciones: ["Siempre libre", "Limitada", "Obligatoria", "Solo judicial"],
+        correcta: 1,
+        explicacion: "En la SL la transmisión de participaciones es limitada."
+      },
+      {
+        pregunta: "¿Cuántos socios mínimos puede tener una sociedad limitada?",
+        opciones: ["1", "2", "3", "4"],
+        correcta: 0,
+        explicacion: "La sociedad limitada puede constituirse con un solo socio."
+      },
+      {
+        pregunta: "La sociedad limitada debe inscribirse en:",
+        opciones: ["Registro de la Propiedad", "Registro Mercantil", "Registro Civil", "Ayuntamiento"],
+        correcta: 1,
+        explicacion: "La SL debe inscribirse en el Registro Mercantil."
+      },
+      {
+        pregunta: "El capital mínimo de una sociedad anónima (SA) es:",
+        opciones: ["3.000 €", "6.000 €", "30.000 €", "60.000 €"],
+        correcta: 3,
+        explicacion: "La SA exige un capital mínimo de 60.000 euros."
+      },
+      {
+        pregunta: "En una sociedad anónima, al constituirse debe desembolsarse al menos:",
+        opciones: ["10 %", "25 %", "50 %", "100 %"],
+        correcta: 1,
+        explicacion: "En la SA debe desembolsarse al menos el 25 % del capital."
+      },
+      {
+        pregunta: "En la sociedad anónima, el capital se divide en:",
+        opciones: ["Participaciones", "Bonos", "Acciones", "Cuotas"],
+        correcta: 2,
+        explicacion: "La SA divide su capital en acciones."
+      },
+      {
+        pregunta: "La transmisión de acciones es libre en:",
+        opciones: ["Sociedad colectiva", "Sociedad civil", "Sociedad limitada", "Sociedad anónima"],
+        correcta: 3,
+        explicacion: "La SA se caracteriza porque la transmisión de acciones es libre."
+      },
+      {
+        pregunta: "La responsabilidad en la sociedad anónima es:",
+        opciones: ["Ilimitada", "Limitada", "Mixta siempre", "Subsidiaria"],
+        correcta: 1,
+        explicacion: "En la SA la responsabilidad de los socios es limitada."
+      },
+      {
+        pregunta: "Las sociedades laborales son sociedades mercantiles:",
+        opciones: ["Especiales", "Públicas", "Administrativas", "Civiles"],
+        correcta: 0,
+        explicacion: "Las sociedades laborales son sociedades mercantiles especiales."
+      },
+      {
+        pregunta: "En las sociedades laborales, al menos este porcentaje del capital pertenece a los trabajadores:",
+        opciones: ["25 %", "40 %", "51 %", "75 %"],
+        correcta: 2,
+        explicacion: "En las sociedades laborales, al menos el 51 % del capital debe pertenecer a trabajadores."
+      },
+      {
+        pregunta: "Las sociedades laborales pueden ser:",
+        opciones: ["Solo SAL", "Solo SLL", "SAL o SLL", "SA o CB"],
+        correcta: 2,
+        explicacion: "Pueden ser Sociedad Anónima Laboral (SAL) o Sociedad Limitada Laboral (SLL)."
+      },
+      {
+        pregunta: "El capital mínimo de una SLL es:",
+        opciones: ["1.000 €", "3.000 €", "30.000 €", "60.000 €"],
+        correcta: 1,
+        explicacion: "La SLL sigue el mínimo de la SL: 3.000 euros."
+      },
+      {
+        pregunta: "El capital mínimo de una SAL es:",
+        opciones: ["3.000 €", "6.000 €", "30.000 €", "60.000 €"],
+        correcta: 3,
+        explicacion: "La SAL sigue el mínimo de la SA: 60.000 euros."
+      },
+      {
+        pregunta: "La responsabilidad en las sociedades laborales es:",
+        opciones: ["Ilimitada", "Limitada", "Solo solidaria", "Penal"],
+        correcta: 1,
+        explicacion: "Las sociedades laborales tienen responsabilidad limitada."
+      },
+      {
+        pregunta: "Las cooperativas se caracterizan por:",
+        opciones: ["La gestión democrática", "La libre transmisión de acciones", "La responsabilidad ilimitada siempre", "La ausencia de socios"],
+        correcta: 0,
+        explicacion: "La cooperativa se basa en la participación y gestión democrática de los socios."
+      },
+      {
+        pregunta: "En una cooperativa, los socios participan:",
+        opciones: ["De forma jerárquica", "En igualdad", "Solo si son administradores", "Solo si aportan acciones"],
+        correcta: 1,
+        explicacion: "En las cooperativas los socios participan en igualdad."
+      },
+      {
+        pregunta: "El objetivo de una cooperativa es:",
+        opciones: ["Satisfacer necesidades comunes", "Cotizar en bolsa", "Emitir leyes", "Sustituir al Estado"],
+        correcta: 0,
+        explicacion: "Las cooperativas buscan satisfacer necesidades comunes de sus socios."
+      },
+      {
+        pregunta: "¿Qué tipo de cooperativa está formada por personas físicas?",
+        opciones: ["De segundo grado", "De primer grado", "Mixta", "Mercantil"],
+        correcta: 1,
+        explicacion: "Las cooperativas de primer grado están formadas por personas físicas."
+      },
+      {
+        pregunta: "Las cooperativas de segundo grado están formadas por:",
+        opciones: ["Solo autónomos", "Agrupaciones de cooperativas", "Ayuntamientos", "Sociedades anónimas"],
+        correcta: 1,
+        explicacion: "Las cooperativas de segundo grado agrupan varias cooperativas."
+      },
+      {
+        pregunta: "Las fuentes del Derecho son:",
+        opciones: ["Formas de financiación empresarial", "Modos de creación de normas jurídicas", "Solo leyes estatales", "Solo reglamentos"],
+        correcta: 1,
+        explicacion: "Las fuentes del Derecho son los modos de creación de normas jurídicas."
+      },
+      {
+        pregunta: "Las fuentes del Derecho se clasifican en:",
+        opciones: ["Públicas, privadas y mixtas", "Nacionales, europeas y locales", "Directas, subsidiarias e indirectas", "Legales, sociales y económicas"],
+        correcta: 2,
+        explicacion: "Según el tema, las fuentes del Derecho se dividen en directas, subsidiarias e indirectas."
+      },
+      {
+        pregunta: "Entre las fuentes directas del Derecho están:",
+        opciones: ["Ley y reglamento", "Costumbre y doctrina", "Jurisprudencia y tratados", "Solo la costumbre"],
+        correcta: 0,
+        explicacion: "Las fuentes directas son la ley y el reglamento."
+      },
+      {
+        pregunta: "La ley orgánica regula, entre otras materias:",
+        opciones: ["Cualquier materia económica", "Solo normas municipales", "Derechos fundamentales y libertades públicas", "Solo contratos mercantiles"],
+        correcta: 2,
+        explicacion: "La ley orgánica regula derechos fundamentales, libertades públicas, estatutos de autonomía y régimen electoral."
+      },
+      {
+        pregunta: "¿Qué mayoría necesita la ley orgánica?",
+        opciones: ["Mayoría simple", "Mayoría absoluta", "Unanimidad", "Mayoría relativa"],
+        correcta: 1,
+        explicacion: "La ley orgánica necesita mayoría absoluta del Congreso."
+      },
+      {
+        pregunta: "La ley ordinaria regula:",
+        opciones: ["Solo derechos fundamentales", "Materias que no son de ley orgánica", "Solo el régimen electoral", "Solo estatutos de autonomía"],
+        correcta: 1,
+        explicacion: "La ley ordinaria regula las materias no reservadas a ley orgánica."
+      },
+      {
+        pregunta: "La ley ordinaria se aprueba por:",
+        opciones: ["Mayoría simple", "Mayoría absoluta", "Unanimidad", "Referéndum obligatorio"],
+        correcta: 0,
+        explicacion: "La ley ordinaria se aprueba por mayoría simple."
+      },
+      {
+        pregunta: "Los decretos legislativos son normas con fuerza de ley dictadas por:",
+        opciones: ["Los jueces", "El Gobierno", "Los Ayuntamientos", "Los juristas"],
+        correcta: 1,
+        explicacion: "Los decretos legislativos son aprobados por el Gobierno por delegación parlamentaria."
+      },
+      {
+        pregunta: "La legislación delegada se produce cuando:",
+        opciones: ["El Gobierno delega en el Parlamento", "El Parlamento delega en el Gobierno", "El Rey delega en los jueces", "La UE delega en los municipios"],
+        correcta: 1,
+        explicacion: "La legislación delegada existe cuando el Parlamento delega en el Gobierno."
+      },
+      {
+        pregunta: "Los textos refundidos sirven para:",
+        opciones: ["Unificar varias leyes", "Aprobar presupuestos", "Elegir al Presidente", "Crear jurisprudencia"],
+        correcta: 0,
+        explicacion: "Los textos refundidos reúnen y unifican varias leyes dispersas."
+      },
+      {
+        pregunta: "Los textos articulados se elaboran:",
+        opciones: ["Sin bases previas", "Siguiendo unas bases dadas por las Cortes", "Por el Tribunal Supremo", "Por costumbre"],
+        correcta: 1,
+        explicacion: "Los textos articulados se redactan siguiendo las bases marcadas por las Cortes."
+      },
+      {
+        pregunta: "El decreto-ley se utiliza en casos de:",
+        opciones: ["Vacaciones parlamentarias", "Extraordinaria y urgente necesidad", "Conflictos entre socios", "Solo materias municipales"],
+        correcta: 1,
+        explicacion: "El decreto-ley se reserva para casos de extraordinaria y urgente necesidad."
+      },
+      {
+        pregunta: "El decreto-ley debe ser convalidado por el Congreso en un plazo de:",
+        opciones: ["15 días", "20 días", "30 días", "60 días"],
+        correcta: 2,
+        explicacion: "El decreto-ley debe someterse al Congreso dentro de los 30 días siguientes."
+      },
+      {
+        pregunta: "Cuando la iniciativa legislativa parte del Gobierno, el texto se llama:",
+        opciones: ["Proposición de ley", "Proyecto de ley", "Decreto-ley", "Reglamento"],
+        correcta: 1,
+        explicacion: "Si la iniciativa parte del Gobierno, se denomina proyecto de ley."
+      },
+      {
+        pregunta: "Cuando la iniciativa parte de diputados o senadores, se llama:",
+        opciones: ["Proyecto de ley", "Proposición de ley", "Reglamento", "Texto refundido"],
+        correcta: 1,
+        explicacion: "Cuando parte de parlamentarios, recibe el nombre de proposición de ley."
+      },
+      {
+        pregunta: "La iniciativa popular requiere un mínimo de:",
+        opciones: ["100.000 firmas", "250.000 firmas", "500.000 firmas", "1.000.000 firmas"],
+        correcta: 2,
+        explicacion: "La iniciativa popular necesita la presentación de 500.000 firmas."
+      },
+      {
+        pregunta: "¿Cuál es el orden correcto de las fases finales de la ley?",
+        opciones: ["Publicación, sanción y promulgación", "Sanción, promulgación y publicación", "Promulgación, sanción y publicación", "Sanción, publicación y votación"],
+        correcta: 1,
+        explicacion: "Tras la aprobación, la ley pasa por sanción, promulgación y publicación."
+      },
+      {
+        pregunta: "La sanción de la ley corresponde a:",
+        opciones: ["El Presidente del Gobierno", "El Rey", "El Tribunal Supremo", "El Senado"],
+        correcta: 1,
+        explicacion: "La sanción es la firma del Rey."
+      },
+      {
+        pregunta: "La publicación de la ley se realiza en:",
+        opciones: ["El Registro Mercantil", "El BOE", "La Constitución", "El Parlamento Europeo"],
+        correcta: 1,
+        explicacion: "La ley se publica en el Boletín Oficial del Estado."
+      },
+      {
+        pregunta: "¿Qué es un reglamento?",
+        opciones: ["Una norma superior a la Constitución", "Una norma escrita de rango inferior a la ley elaborada por el poder ejecutivo", "Una costumbre jurídica", "Una sentencia del Tribunal Supremo"],
+        correcta: 1,
+        explicacion: "El reglamento es una norma escrita inferior a la ley y la dicta el poder ejecutivo."
+      },
+      {
+        pregunta: "El reglamento es elaborado por:",
+        opciones: ["El poder judicial", "El poder ejecutivo", "Solo el Parlamento", "Los juristas"],
+        correcta: 1,
+        explicacion: "Los reglamentos los elabora el poder ejecutivo."
+      },
+      {
+        pregunta: "¿Qué forma adopta normalmente el reglamento en la Administración del Estado?",
+        opciones: ["Real Decreto u Orden", "Bando y edicto", "Solo decreto autonómico", "Solo reglamento europeo"],
+        correcta: 0,
+        explicacion: "En la Administración del Estado, el reglamento puede adoptar forma de Real Decreto u Orden."
+      },
+      {
+        pregunta: "En la Administración autonómica, el reglamento puede adoptar forma de:",
+        opciones: ["Decreto u Orden", "Real Decreto únicamente", "Bando municipal", "Texto articulado"],
+        correcta: 0,
+        explicacion: "En la Administración autonómica puede adoptar forma de Decreto u Orden."
+      },
+      {
+        pregunta: "En la Administración local aparecen como reglamentos:",
+        opciones: ["Acciones y participaciones", "Ordenanzas, reglamentos y bandos", "Solo leyes ordinarias", "Solo decretos-ley"],
+        correcta: 1,
+        explicacion: "En la administración local destacan ordenanzas, reglamentos y bandos."
+      },
+      {
+        pregunta: "Las fuentes subsidiarias del Derecho son:",
+        opciones: ["Ley y reglamento", "Costumbre y principios generales del Derecho", "Tratados y jurisprudencia", "Solo doctrina"],
+        correcta: 1,
+        explicacion: "Las fuentes subsidiarias son la costumbre y los principios generales del Derecho."
+      },
+      {
+        pregunta: "La costumbre es:",
+        opciones: ["Una ley aprobada por el Congreso", "Una norma creada por el uso social", "Una sentencia", "Una opinión doctrinal"],
+        correcta: 1,
+        explicacion: "La costumbre nace del uso social repetido y aceptado."
+      },
+      {
+        pregunta: "La costumbre se aplica cuando:",
+        opciones: ["No existe ley aplicable", "Lo decide un juez aunque exista ley", "Lo ordena el BOE", "Siempre antes que la ley"],
+        correcta: 0,
+        explicacion: "La costumbre se aplica por falta de ley."
+      },
+      {
+        pregunta: "Para que la costumbre pueda aplicarse, debe:",
+        opciones: ["Ser secreta", "Ser aprobada por el Congreso", "Poder probarse", "Tener rango de ley orgánica"],
+        correcta: 2,
+        explicacion: "La costumbre debe poder probarse y no ser contraria a la moral ni al orden público."
+      },
+      {
+        pregunta: "La costumbre no puede ser contraria a:",
+        opciones: ["La economía y el comercio", "La moral y el orden público", "La jurisprudencia extranjera", "Los apuntes del alumno"],
+        correcta: 1,
+        explicacion: "Para aplicarse, la costumbre no puede ir contra la moral ni el orden público."
+      },
+      {
+        pregunta: "Los principios generales del Derecho se aplican cuando no hay:",
+        opciones: ["Constitución ni reglamentos", "Ley ni costumbre", "Jurisprudencia ni doctrina", "BOE ni tratados"],
+        correcta: 1,
+        explicacion: "Los principios generales del Derecho se aplican en defecto de ley y costumbre."
+      },
+      {
+        pregunta: "Los principios generales del Derecho son:",
+        opciones: ["Normas municipales", "Ideas básicas que inspiran el ordenamiento jurídico", "Acciones de una SA", "Contratos de una sociedad civil"],
+        correcta: 1,
+        explicacion: "Son los principios e ideas básicas que inspiran el ordenamiento jurídico."
+      },
+      {
+        pregunta: "Entre las fuentes indirectas del Derecho se encuentran:",
+        opciones: ["Ley y reglamento", "Costumbre y principios", "Tratados internacionales, jurisprudencia y doctrina", "Solo los reglamentos"],
+        correcta: 2,
+        explicacion: "Las fuentes indirectas incluyen tratados internacionales, jurisprudencia y doctrina."
+      },
+      {
+        pregunta: "Los tratados internacionales forman parte del derecho interno cuando:",
+        opciones: ["Los firma un jurista", "Se publican en el BOE", "Los aprueba un Ayuntamiento", "Los aplica una cooperativa"],
+        correcta: 1,
+        explicacion: "Los tratados internacionales pasan a formar parte del derecho interno cuando se publican en el BOE."
+      },
+      {
+        pregunta: "La jurisprudencia es:",
+        opciones: ["La opinión de juristas", "La costumbre repetida", "El criterio del Tribunal Supremo al interpretar el Derecho", "Un reglamento autonómico"],
+        correcta: 2,
+        explicacion: "La jurisprudencia es la interpretación reiterada del Derecho por el Tribunal Supremo."
+      },
+      {
+        pregunta: "La doctrina consiste en:",
+        opciones: ["Tratados publicados en el BOE", "Opiniones de juristas", "Normas del Gobierno", "Leyes orgánicas"],
+        correcta: 1,
+        explicacion: "La doctrina está formada por las opiniones y estudios de los juristas."
+      },
+      {
+        pregunta: "¿Qué sociedad divide su capital en participaciones y no en acciones?",
+        opciones: ["Sociedad anónima", "Sociedad limitada", "Sociedad colectiva", "Sociedad comanditaria simple"],
+        correcta: 1,
+        explicacion: "La SL divide el capital en participaciones; la SA lo divide en acciones."
+      },
+      {
+        pregunta: "¿En cuál de estas sociedades la transmisión es libre?",
+        opciones: ["Sociedad limitada", "Sociedad anónima", "Sociedad colectiva", "Sociedad civil"],
+        correcta: 1,
+        explicacion: "La transmisión libre es propia de la sociedad anónima."
+      },
+      {
+        pregunta: "¿Cuál de estas formas jurídicas no exige capital mínimo según el tema?",
+        opciones: ["Sociedad limitada", "Sociedad anónima", "Sociedad colectiva", "SAL"],
+        correcta: 2,
+        explicacion: "La sociedad colectiva no exige capital mínimo."
+      },
+      {
+        pregunta: "¿Cuál de estas formas jurídicas exige el mayor capital mínimo?",
+        opciones: ["SL", "SA", "SLL", "Sociedad civil"],
+        correcta: 1,
+        explicacion: "La SA exige 60.000 €, más que la SL o la SLL."
+      }
+    ];
+
+    let preguntas = [];
+    let indiceActual = 0;
+    let aciertos = 0;
+    let respondida = false;
+
+    const numeroPregunta = document.getElementById("numeroPregunta");
+    const textoPregunta = document.getElementById("textoPregunta");
+    const opcionesDiv = document.getElementById("opciones");
+    const resultadoDiv = document.getElementById("resultado");
+    const progreso = document.getElementById("progreso");
+    const marcador = document.getElementById("marcador");
+    const btnSiguiente = document.getElementById("btnSiguiente");
+    const quizBox = document.getElementById("quizBox");
+    const finalBox = document.getElementById("finalBox");
+    const notaFinal = document.getElementById("notaFinal");
+    const btnReiniciar = document.getElementById("btnReiniciar");
+    const barraProgreso = document.getElementById("barraProgreso");
+
+    function mezclarArray(array) {
+      const copia = [...array];
+      for (let i = copia.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copia[i], copia[j]] = [copia[j], copia[i]];
+      }
+      return copia;
+    }
+
+    function iniciarTest() {
+      preguntas = mezclarArray(bancoPreguntas);
+      indiceActual = 0;
+      aciertos = 0;
+      respondida = false;
+      marcador.textContent = "0";
+      finalBox.classList.add("oculto");
+      quizBox.classList.remove("oculto");
+      cargarPregunta();
+    }
+
+    function actualizarBarra() {
+      const porcentaje = ((indiceActual) / preguntas.length) * 100;
+      barraProgreso.style.width = `${porcentaje}%`;
+    }
+
+    function cargarPregunta() {
+      respondida = false;
+      resultadoDiv.style.display = "none";
+      resultadoDiv.className = "resultado";
+      btnSiguiente.classList.add("oculto");
+
+      const actual = preguntas[indiceActual];
+
+      numeroPregunta.textContent = `Pregunta ${indiceActual + 1}`;
+      progreso.textContent = `Pregunta ${indiceActual + 1} de ${preguntas.length}`;
+      textoPregunta.textContent = actual.pregunta;
+      opcionesDiv.innerHTML = "";
+      actualizarBarra();
+
+      actual.opciones.forEach((opcion, i) => {
+        const boton = document.createElement("button");
+        boton.classList.add("opcion");
+        boton.textContent = opcion;
+        boton.addEventListener("click", () => responder(i, boton));
+        opcionesDiv.appendChild(boton);
+      });
+    }
+
+    function responder(indiceSeleccionado, botonPulsado) {
+      if (respondida) return;
+      respondida = true;
+
+      const actual = preguntas[indiceActual];
+      const botones = document.querySelectorAll(".opcion");
+
+      botones.forEach((btn, i) => {
+        btn.disabled = true;
+        if (i === actual.correcta) {
+          btn.classList.add("correcta");
+        }
+      });
+
+      if (indiceSeleccionado === actual.correcta) {
+        aciertos++;
+        marcador.textContent = aciertos;
+        botonPulsado.classList.add("correcta");
+        resultadoDiv.classList.add("ok");
+        resultadoDiv.innerHTML = `
+          <strong>Correcto.</strong>
+          <p class="explicacion">${actual.explicacion}</p>
+        `;
+      } else {
+        botonPulsado.classList.add("incorrecta");
+        resultadoDiv.classList.add("error");
+        resultadoDiv.innerHTML = `
+          <strong>Incorrecto.</strong>
+          <p>La respuesta correcta es: <strong>${actual.opciones[actual.correcta]}</strong>.</p>
+          <p class="explicacion">${actual.explicacion}</p>
+        `;
+      }
+
+      resultadoDiv.style.display = "block";
+      btnSiguiente.classList.remove("oculto");
+    }
+
+    btnSiguiente.addEventListener("click", () => {
+      indiceActual++;
+      if (indiceActual < preguntas.length) {
+        cargarPregunta();
+      } else {
+        mostrarFinal();
+      }
+    });
+
+    function mostrarFinal() {
+      quizBox.classList.add("oculto");
+      finalBox.classList.remove("oculto");
+      barraProgreso.style.width = "100%";
+
+      const total = preguntas.length;
+      const porcentaje = Math.round((aciertos / total) * 100);
+
+      let mensaje = "";
+      if (porcentaje >= 90) {
+        mensaje = "Excelente. Llevas el tema muy bien preparado.";
+      } else if (porcentaje >= 75) {
+        mensaje = "Muy buen trabajo. Te conviene repasar solo algunos detalles.";
+      } else if (porcentaje >= 60) {
+        mensaje = "Vas bien, pero aún necesitas afianzar varios apartados.";
+      } else {
+        mensaje = "Necesitas repasar el resumen y el esquema antes de volver a intentarlo.";
+      }
+
+      notaFinal.innerHTML = `
+        Has acertado <strong>${aciertos}</strong> de <strong>${total}</strong> preguntas
+        (<strong>${porcentaje}%</strong>).<br><br>${mensaje}
+      `;
+    }
+
+    btnReiniciar.addEventListener("click", iniciarTest);
+
+    iniciarTest();
+  </script>
+</body>
+</html>

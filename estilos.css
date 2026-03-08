@@ -1,0 +1,277 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+:root {
+    --color-fondo: #f4f6f8;
+    --color-superficie: #ffffff;
+    --color-primario: #1e3a5f;
+    --color-primario-claro: #2f6fed;
+    --color-primario-hover: #1f56c2;
+    --color-secundario: #6c757d;
+    --color-secundario-hover: #565e64;
+    --color-texto: #222;
+    --color-texto-suave: #5f6b7a;
+    --color-borde: #d9e1ea;
+    --sombra: 0 4px 14px rgba(0, 0, 0, 0.08);
+    --radio: 14px;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background-color: var(--color-fondo);
+    color: var(--color-texto);
+    line-height: 1.6;
+}
+
+header {
+    background: linear-gradient(135deg, var(--color-primario), #2c517f);
+    color: white;
+    text-align: center;
+    padding: 35px 20px;
+    box-shadow: var(--sombra);
+}
+
+header h1 {
+    font-size: 2rem;
+    margin-bottom: 10px;
+}
+
+header p {
+    font-size: 1rem;
+    opacity: 0.95;
+}
+
+.contenedor {
+    width: 92%;
+    max-width: 1000px;
+    margin: 30px auto;
+}
+
+.tarjeta {
+    background-color: var(--color-superficie);
+    padding: 24px;
+    margin-bottom: 22px;
+    border-radius: var(--radio);
+    box-shadow: var(--sombra);
+    border: 1px solid var(--color-borde);
+}
+
+.tarjeta h2 {
+    color: var(--color-primario);
+    margin-bottom: 14px;
+    font-size: 1.45rem;
+}
+
+.tarjeta h3 {
+    color: #274b73;
+    margin-top: 18px;
+    margin-bottom: 10px;
+    font-size: 1.15rem;
+}
+
+.tarjeta h4 {
+    color: #365f8f;
+    margin-top: 14px;
+    margin-bottom: 8px;
+    font-size: 1rem;
+}
+
+.tarjeta p {
+    margin-bottom: 10px;
+}
+
+.tarjeta ul,
+.tarjeta ol {
+    padding-left: 22px;
+    margin-bottom: 12px;
+}
+
+.tarjeta li {
+    margin-bottom: 8px;
+}
+
+.botones {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.boton,
+.boton-secundario {
+    display: inline-block;
+    text-align: center;
+    text-decoration: none;
+    padding: 14px 18px;
+    border-radius: 10px;
+    font-weight: bold;
+    transition: 0.3s ease;
+    cursor: pointer;
+    border: none;
+}
+
+.boton {
+    background-color: var(--color-primario-claro);
+    color: white;
+}
+
+.boton:hover {
+    background-color: var(--color-primario-hover);
+    transform: translateY(-1px);
+}
+
+.boton-secundario {
+    background-color: var(--color-secundario);
+    color: white;
+}
+
+.boton-secundario:hover {
+    background-color: var(--color-secundario-hover);
+    transform: translateY(-1px);
+}
+
+mark {
+    background-color: #fff3a3;
+    color: #222;
+    padding: 2px 6px;
+    border-radius: 6px;
+    font-weight: bold;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 12px;
+    margin-bottom: 12px;
+    background-color: white;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+th,
+td {
+    border: 1px solid var(--color-borde);
+    padding: 12px;
+    text-align: left;
+}
+
+th {
+    background-color: #eaf1fb;
+    color: var(--color-primario);
+}
+
+strong {
+    color: #15314d;
+}
+
+footer {
+    text-align: center;
+    padding: 20px;
+    background-color: #e9ecef;
+    margin-top: 30px;
+    color: var(--color-texto-suave);
+    font-size: 0.95rem;
+}
+
+.oculto {
+    display: none;
+}
+
+/* Mejoras específicas para el test */
+.pregunta-box,
+.final-box,
+.mini-tarjeta {
+    border: 1px solid var(--color-borde);
+}
+
+.pregunta-texto {
+    line-height: 1.5;
+}
+
+.opcion {
+    font-family: inherit;
+}
+
+.resultado p {
+    margin-top: 8px;
+}
+
+/* Enlaces dentro del texto */
+a {
+    color: var(--color-primario-claro);
+}
+
+a:hover {
+    color: var(--color-primario-hover);
+}
+
+/* Adaptación móvil */
+@media (max-width: 768px) {
+    header {
+        padding: 28px 16px;
+    }
+
+    header h1 {
+        font-size: 1.7rem;
+    }
+
+    header p {
+        font-size: 0.95rem;
+    }
+
+    .contenedor {
+        width: 94%;
+        margin: 20px auto;
+    }
+
+    .tarjeta {
+        padding: 18px;
+        border-radius: 12px;
+    }
+
+    .tarjeta h2 {
+        font-size: 1.25rem;
+    }
+
+    .tarjeta h3 {
+        font-size: 1.05rem;
+    }
+
+    .boton,
+    .boton-secundario {
+        width: 100%;
+        padding: 13px;
+        font-size: 0.96rem;
+    }
+
+    th,
+    td {
+        padding: 10px;
+        font-size: 0.95rem;
+    }
+}
+
+@media (max-width: 480px) {
+    body {
+        font-size: 15px;
+    }
+
+    header h1 {
+        font-size: 1.5rem;
+    }
+
+    .tarjeta {
+        padding: 16px;
+    }
+
+    .tarjeta ul,
+    .tarjeta ol {
+        padding-left: 18px;
+    }
+}
